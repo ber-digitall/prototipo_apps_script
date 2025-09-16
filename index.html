@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Protótipo 1 - Atualização de Estoque</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #c3cfe2, #f5f7fa);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 30px;
+      width: 90%;
+      max-width: 600px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      color: #333;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    input, button {
+      padding: 10px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+
+    input {
+      background: rgba(255, 255, 255, 0.3);
+      color: #000;
+    }
+
+    button {
+      background-color: #4a90e2;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #357ab8;
+    }
+
+    table {
+      width: 100%;
+      margin-top: 20px;
+      border-collapse: collapse;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(5px);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #ccc;
+    }
+
+    tr:hover {
+      background-color: rgba(255, 255, 255, 0.3);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Atualização de Estoque</h1>
+    <form id="estoqueForm">
+      <input type="text" id="codigo" placeholder="Código do Produto" required />
+      <input type="text" id="descricao" placeholder="Descrição" required />
+      <input type="number" id="quantidade" placeholder="Quantidade" required />
+      <button type="submit">Atualizar</button>
+    </form>
+
+    <table id="tabelaEstoque">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Descrição</th>
+          <th>Quantidade</th>
+          <th>Data e Hora</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <script>
+    // Cole aqui a URL do seu Web App do Google Apps Script
+    const scriptURL = "https://script.google.com/macros/s/AKfycbw2Jce3qdDObAeVoLF1H9hQQ3AXPmO3psZ2RP8bt2H9VxVamj_gA4PijHxkE6ezN7OW/exec";
+
+    document.getElementById('estoqueForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const codigo = document.getElementById('codigo').value;
+      const descricao = document.getElementById('descricao').value;
+      const quantidade = document.getElementById('quantidade').value;
+      const dataHora = new Date().toLocaleString('pt-BR');
+
+      // Adiciona na tabela visual
+      const tabela = document.querySelector('#tabelaEstoque tbody');
+      const novaLinha = tabela.insertRow();
+      novaLinha.innerHTML = `
+        <td>${codigo}</td>
+        <td>${descricao}</td>
+        <td>${quantidade}</td>
+        <td>${dataHora}</td>
+      `;
+
+      // Envia para o Google Apps Script
+      const dados = { codigo, descricao, quantidade };
+
+      fetch(scriptURL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(dados)
+      })
+      .then(res => {
+        if (!res.ok) throw new Error("Erro na resposta do servidor");
+        return res.text();
+      })
+      .then(msg => {
+        alert(msg);
+        document.getElementById('estoqueForm').reset();
+      })
+      .catch(err => {
+        alert("Erro ao salvar: " + err.message);
+      });
+    });
+  </script>
+</body>
+</html>
